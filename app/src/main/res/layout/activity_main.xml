@@ -15,12 +15,11 @@
         android:paddingVertical="10dp">
 
         <TextView
-            android:id="@+id/status"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="sans"
-            android:text="@string/status_checking"
+            android:text="@string/account"
             android:textColor="@color/ink"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -31,10 +30,16 @@
             android:text="@string/library" />
 
         <Button
+            android:id="@+id/refresh"
+            style="@style/Widget.FreeLibrary.Button.Compact"
+            android:layout_marginStart="4dp"
+            android:text="@string/refresh" />
+
+        <Button
             android:id="@+id/open_nytimes"
             style="@style/Widget.FreeLibrary.Button.Compact"
-            android:layout_marginStart="6dp"
-            android:text="@string/nyt" />
+            android:layout_marginStart="4dp"
+            android:text="@string/open_nytimes" />
     </LinearLayout>
 
     <ProgressBar
