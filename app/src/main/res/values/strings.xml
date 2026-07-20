@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Library NYTimes</string>
+    <string name="library">Library</string>
+    <string name="nyt">NYTimes</string>
+    <string name="status_checking">Checking NYTimes access&#8230;</string>
+    <string name="status_sign_in">Sign in to check access</string>
+    <string name="status_library">Library activation</string>
+    <string name="status_activating">Confirming activation&#8230;</string>
+    <string name="status_subscribed">Access confirmed</string>
+    <string name="status_check_failed">Could not check access; use Library to renew</string>
+    <string name="web_content">NYTimes account and library registration</string>
+    <string name="cannot_open_link">No app can open this link.</string>
+</resources>

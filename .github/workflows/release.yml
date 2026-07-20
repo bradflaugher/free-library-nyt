@@ -1,0 +1,77 @@
+name: Publish latest APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: latest-release
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Calculate version
+        id: version
+        shell: bash
+        run: |
+          release_date="$(date -u +%Y.%m.%d)"
+          epoch_day="$(($(date -u +%s) / 86400))"
+          version_name="${release_date}.${GITHUB_RUN_NUMBER}"
+          version_code="$((epoch_day * 1000 + GITHUB_RUN_NUMBER % 1000))"
+          echo "name=${version_name}" >> "$GITHUB_OUTPUT"
+          echo "code=${version_code}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore release signing key
+        shell: bash
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+        run: printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+
+      - name: Build signed release APK
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+          RELEASE_KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: ./gradlew clean assembleRelease
+
+      - name: Prepare release asset
+        shell: bash
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk "dist/library-nytimes-${VERSION_NAME}.apk"
+
+      - name: Replace latest release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest "dist/library-nytimes-${VERSION_NAME}.apk" \
+            --target "$GITHUB_SHA" \
+            --title "Latest (${VERSION_NAME})" \
+            --notes "Android 16 APK built from main on ${VERSION_NAME}." \
+            --latest
