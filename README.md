@@ -29,3 +29,5 @@ The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 Every push to `main` builds a signed APK with a UTC date-based version such as
 `2026.07.20.12`. GitHub Actions replaces the repository's single `latest`
 release, so the Releases page always contains only the newest APK.
+
+[Download the latest APK](https://github.com/bradflaugher/free-library-nyt/releases/latest/download/library-nytimes.apk)

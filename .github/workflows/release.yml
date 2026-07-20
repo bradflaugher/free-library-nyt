@@ -56,12 +56,9 @@ jobs:
         run: ./gradlew clean assembleRelease
 
       - name: Prepare release asset
-        shell: bash
-        env:
-          VERSION_NAME: ${{ steps.version.outputs.name }}
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk "dist/library-nytimes-${VERSION_NAME}.apk"
+          cp app/build/outputs/apk/release/app-release.apk dist/library-nytimes.apk
 
       - name: Replace latest release
         shell: bash
@@ -70,7 +67,7 @@ jobs:
           VERSION_NAME: ${{ steps.version.outputs.name }}
         run: |
           gh release delete latest --cleanup-tag --yes || true
-          gh release create latest "dist/library-nytimes-${VERSION_NAME}.apk" \
+          gh release create latest dist/library-nytimes.apk \
             --target "$GITHUB_SHA" \
             --title "Latest (${VERSION_NAME})" \
             --notes "Android 16 APK built from main on ${VERSION_NAME}." \
